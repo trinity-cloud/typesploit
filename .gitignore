@@ -1,0 +1,42 @@
+# Node.js dependencies
+node_modules/
+
+# Build output
+lib/
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Coverage reports
+coverage/
+
+# Optional npm cache
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Env files
+.env
+.env.*.local
+
+# MacOS
+.DS_Store
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Temporary files
+.temp 
