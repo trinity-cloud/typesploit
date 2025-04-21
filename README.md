@@ -2,6 +2,25 @@
 
 `typesploit` is a TypeScript library designed to interact with the Metasploit RPC (MSGRPC) service. It provides an object-oriented interface inspired by `pymetasploit3`, enabling developers to control and automate Metasploit tasks programmatically from TypeScript or JavaScript environments, such as Node.js applications or VSCode extensions.
 
+## Table of Contents
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Setup Metasploit RPC Server](#setup-metasploit-rpc-server)
+- [Environment & Configuration](#environment--configuration)
+- [Quickstart](#quickstart)
+- [Basic Usage](#basic-usage)
+- [API Overview](#api-overview)
+- [Testing](#testing)
+- [Error Handling](#error-handling)
+- [Roadmap](#roadmap)
+- [Troubleshooting & FAQ](#troubleshooting--faq)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
+- [Support](#support)
+
+
 ## Features
 
 *   Connects to remote or local `msfrpcd` instances.
@@ -22,20 +41,60 @@
 ## Installation
 
 ```bash
-npm install <path-to-typesploit-package-or-repo> 
-# or yarn add <path-to-typesploit-package-or-repo>
+# Install from npm (when published)
+npm install typesploit
 
-# Ensure you have peer dependencies if needed (e.g., node-fetch, @msgpack/msgpack)
+# Install from repository
+npm install git+https://github.com/trinity-cloud/typesploit.git
+
+# Ensure you have peer dependencies
 npm install node-fetch @msgpack/msgpack
 ```
-*(Note: Replace `<path-to-typesploit-package-or-repo>` with the actual installation method once packaged or published).*
+
++ ## Prerequisites
++
++ - Node.js >= 14
++ - Peer dependencies:
++   - `node-fetch`
++   - `@msgpack/msgpack`
+
+## Setup Metasploit RPC Server
+
+Before using this library, you need to start the Metasploit RPC server:
+
+```bash
+# Starting msfrpcd from command line
+msfrpcd -P password -S -a 127.0.0.1
+
+# Or from within msfconsole
+load msgrpc Pass=password ServerHost=127.0.0.1 ServerPort=55553 SSL=false
+```
+
+## Quickstart
+
+A minimal example to get you going quickly:
+
+```typescript
+import { MetasploitClient } from 'typesploit';
+
+(async () => {
+  const client = new MetasploitClient({ password: 'YOUR_SECRET' });
+  await client.login();
+  console.log('Core version:', (await client.core.version()).version);
+  await client.logout();
+})();
+```
+
+## Examples
+
+Browse the `examples/` folder for more complete usage scenarios, such as scanning hosts, running exploits, and automating workflows.
 
 ## Basic Usage
 
 ```typescript
-import { MetasploitClient } from './index'; // Assuming index.ts exports the main client
-import { MeterpreterSession, ExploitModule, PayloadModule, Workspace } from './index'; // Import specific types
-import { MsfAuthError } from './errors';
+import { MetasploitClient } from 'typesploit';
+import { MeterpreterSession, ExploitModule, PayloadModule, Workspace } from 'typesploit';
+import { MsfAuthError } from 'typesploit/errors';
 
 async function main() {
   const client = new MetasploitClient({
@@ -50,7 +109,7 @@ async function main() {
 
   try {
     // Connect and authenticate (implicitly called on first operation if needed, or call explicitly)
-    await client.login(); 
+    await client.login();
     console.log('Connected and Authenticated!');
     console.log('Core Version:', await client.core.version());
 
@@ -77,7 +136,7 @@ async function main() {
 
     for (const sid in sessions) {
       const session = sessions[sid];
-      console.log(`Session ${sid}: Type=${session.type}, Info=${session.info.info}`);
+      console.log(`Session ${sid}: Type=${session.info.type}, Info=${session.info.info}`);
       
       if (session instanceof MeterpreterSession) {
           console.log('  (Meterpreter Session)');
@@ -134,7 +193,7 @@ async function main() {
     }
   } finally {
     // Optional: Logout or clean up
-     await client.logout(); // Requires client.logout() to be implemented
+     await client.logout(); 
   }
 }
 
@@ -143,41 +202,41 @@ main();
 
 ## API Overview
 
-The main entry point is the `MetasploitClient` class (exported from `index.ts`). After instantiation and connection/authentication, you access different functionalities through manager properties:
+The main entry point is the `MetasploitClient` class. After instantiation and authentication, you access different functionalities through manager properties:
 
-### `client.core` (`CoreManager`)
+### `client.core` (CoreManager)
 Handles core Metasploit functions.
-*   `version(): Promise<any>`: Get Metasploit framework version info.
-*   `stop(): Promise<any>`: Stop the Metasploit RPC server.
-*   `setg(variable: string, value: any): Promise<any>`: Set a global datastore option.
-*   `unsetg(variable: string): Promise<any>`: Unset a global datastore option.
-*   `save(): Promise<any>`: Save the global datastore.
-*   `reloadModules(): Promise<any>`: Reload modules.
-*   `moduleStats(): Promise<any>`: Get module counts.
-*   `addModulePath(path: string): Promise<any>`: Add a path to search for modules.
-*   `threadList(): Promise<any>`: List running framework threads.
-*   `threadKill(tid: string): Promise<any>`: Kill a framework thread.
+*   `version()`: Get Metasploit framework version info.
+*   `stop()`: Stop the Metasploit RPC server.
+*   `setg(variable, value)`: Set a global datastore option.
+*   `unsetg(variable)`: Unset a global datastore option.
+*   `save()`: Save the global datastore.
+*   `reloadModules()`: Reload modules.
+*   `moduleStats()`: Get module counts.
+*   `addModulePath(path)`: Add a path to search for modules.
+*   `threadList()`: List running framework threads.
+*   `threadKill(tid)`: Kill a framework thread.
 
-### `client.auth` (`AuthManager`)
+### `client.auth` (AuthManager)
 Manages authentication tokens.
 *   `login(user, pass)`: Handled implicitly or explicitly by `MetasploitClient.login()`.
 *   `logout()`: Logs out the current session (invalidates temporary token).
-*   `tokenList(): Promise<any>`: List API tokens.
-*   `tokenAdd(token: string): Promise<any>`: Add a persistent token.
-*   `tokenGenerate(): Promise<string>`: Generate a new temporary token.
-*   `tokenRemove(token: string): Promise<any>`: Remove a persistent token.
+*   `tokenList()`: List API tokens.
+*   `tokenAdd(token)`: Add a persistent token.
+*   `tokenGenerate()`: Generate a new temporary token.
+*   `tokenRemove(token)`: Remove a persistent token.
 
-### `client.modules` (`ModuleManager`)
+### `client.modules` (ModuleManager)
 Manages and interacts with Metasploit modules.
 *   `exploits()`, `payloads()`, `auxiliary()`, `post()`, `encoders()`, `nops()`, `evasion()`: List available module names of the specified type.
-*   `platforms(): Promise<string[]>`: List supported module platforms.
-*   `search(keyword: string): Promise<any>`: Search modules.
+*   `platforms()`: List supported module platforms.
+*   `search(keyword)`: Search modules.
 *   `info(type, name)`, `infoHtml(type, name)`: Get module metadata.
 *   `options(type, name)`: Get module options structure.
 *   `compatibleSessions(name)`, `compatiblePayloads(type, name)`, `targetCompatiblePayloads(type, name, target)`: Find compatible items.
-*   `use(type, name): Promise<MsfModule | ExploitModule | ...>`: **Primary method** - Gets an initialized module object (`ExploitModule`, `PayloadModule`, etc.).
+*   `use(type, name)`: **Primary method** - Gets an initialized module object (`ExploitModule`, `PayloadModule`, etc.).
 
-### Module Objects (`MsfModule`, `ExploitModule`, `PayloadModule`, etc.)
+### Module Objects (MsfModule, ExploitModule, PayloadModule, etc.)
 Returned by `client.modules.use()`.
 *   `info`: (Getter) Module metadata.
 *   `options`: (Getter) List of option names.
@@ -197,17 +256,17 @@ Returned by `client.modules.use()`.
 *   **(AuxiliaryModule/PostModule Specific)**
     *   `action`: (Getter/Setter) Current action.
 
-### `client.sessions` (`SessionManager`)
+### `client.sessions` (SessionManager)
 Manages active sessions.
-*   `list(): Promise<Record<number, MsfSession | MeterpreterSession | ShellSession>>`: List active sessions, returning session objects keyed by numeric ID.
-*   `session(sid: number): Promise<MsfSession | undefined>`: Get a specific session object by ID.
-*   `meterpreter(sid: number)`, `shell(sid: number)`: Get specific session type or throw error.
-*   `stop(sid: number)`: Stop a session.
+*   `list()`: List active sessions, returning session objects keyed by numeric ID.
+*   `session(sid)`: Get a specific session object by ID.
+*   `meterpreter(sid)`, `shell(sid)`: Get specific session type or throw error.
+*   `stop(sid)`: Stop a session.
 
-### Session Objects (`MsfSession`, `MeterpreterSession`, `ShellSession`)
+### Session Objects (MsfSession, MeterpreterSession, ShellSession)
 Returned by `client.sessions.list()` or `client.sessions.session()`.
 *   `id`: Session ID (number).
-*   `info`: Raw session information (`SessionInfo`).
+*   `info`: Raw session information.
 *   `type`: Session type string.
 *   `uuid`: Session UUID.
 *   `stop()`: Stop the session.
@@ -217,38 +276,38 @@ Returned by `client.sessions.list()` or `client.sessions.session()`.
 *   `runCommandWithOutput(cmd, prompts, timeout)`: Helper to run command and wait for prompts.
 *   `runWithOutput(cmd, prompts, timeout)`: Simpler interface for the above.
 *   **(Meterpreter Specific)**
-    *   `ring`: `SessionRing` object for ring buffer interaction (`read`, `put`, `last`, `clear`).
+    *   `ring`: `SessionRing` object for ring buffer interaction.
     *   `detach()`, `kill()`, `tabs(line)`, `runSingle(cmd)`, `runScript(name)`, `getDirectorySeparator()`.
 *   **(Shell Specific)**
     *   `upgrade(lhost, lport)`: Attempt to upgrade to Meterpreter.
 
-### `client.db` (`DbManager`)
+### `client.db` (DbManager)
 Manages database connection and provides access to workspaces.
 *   `connect(opts)`, `disconnect()`, `status()`, `driver()`, `setDriver(name)`: Manage DB connection.
 *   `workspaces`: (Getter) Access the `WorkspaceManager`.
 *   `workspace`: (Getter/Setter) Get or set the current active `Workspace` object.
 
-### `client.db.workspaces` (`WorkspaceManager`)
+### `client.db.workspaces` (WorkspaceManager)
 Manages workspaces.
-*   `list(): Promise<Record<string, Workspace>>`: List available workspace objects keyed by name.
-*   `add(name): Promise<Workspace>`: Add a new workspace.
+*   `list()`: List available workspace objects keyed by name.
+*   `add(name)`: Add a new workspace.
 *   `remove(name)`: Remove a workspace.
 *   `set(name)`: Set the current active workspace by name.
-*   `current(): Promise<Workspace | null>`: Get the current active workspace object.
-*   `get(name): Promise<Workspace | undefined>`: Get a specific workspace object by name.
-*   `workspace(name): Promise<Workspace>`: Get a workspace object, creating it if it doesn't exist.
+*   `current()`: Get the current active workspace object.
+*   `get(name)`: Get a specific workspace object by name.
+*   `workspace(name)`: Get a workspace object, creating it if it doesn't exist.
 
-### Workspace Objects (`Workspace`)
+### Workspace Objects (Workspace)
 Returned by `WorkspaceManager` methods. Represents a single workspace.
 *   `name`: Workspace name.
 *   `info`: Raw workspace info (optional).
-*   `hosts`, `services`, `vulns`, `notes`, `loots`, `creds`, `events`, `clients`: (Getters) Access table manager objects (`HostsTable`, `ServicesTable`, etc.) scoped to this workspace.
+*   `hosts`, `services`, `vulns`, `notes`, `loots`, `creds`, `events`, `clients`: (Getters) Access table manager objects scoped to this workspace.
 *   `delete()`: Delete the workspace.
 *   `importData(base64Data, opts)`: Import base64 encoded data.
 *   `importFile(filePath, opts)`: Import data from a file.
 *   `setCurrent()`: Set this workspace as the active one.
 
-### Table Objects (`HostsTable`, `ServicesTable`, etc.)
+### Table Objects (HostsTable, ServicesTable, etc.)
 Accessed via getters on a `Workspace` object (e.g., `workspace.hosts`).
 *   `list(options?)`: List records in the table, with filtering options.
 *   `report(attributes)`: Add or update a record.
@@ -256,14 +315,14 @@ Accessed via getters on a `Workspace` object (e.g., `workspace.hosts`).
 *   `get(attributes)`: Get a single record matching criteria.
 *   `update(attributes)`: Alias for `report`.
 
-### `client.consoles` (`ConsoleManager`)
+### `client.consoles` (ConsoleManager)
 Manages interactive consoles.
-*   `create(): Promise<MsfConsole>`: Create a new console.
-*   `list(): Promise<Record<string, MsfConsole>>`: List active console objects keyed by ID.
-*   `console(cid: string): Promise<MsfConsole | undefined>`: Get a specific console object.
-*   `destroy(cid: string)`: Destroy a console.
+*   `create()`: Create a new console.
+*   `list()`: List active console objects keyed by ID.
+*   `console(cid)`: Get a specific console object.
+*   `destroy(cid)`: Destroy a console.
 
-### Console Objects (`MsfConsole`)
+### Console Objects (MsfConsole)
 Returned by `ConsoleManager` methods.
 *   `id`: Console ID string.
 *   `prompt`: Current prompt string.
@@ -278,18 +337,30 @@ Returned by `ConsoleManager` methods.
 *   `runCommandAndWait(cmd, timeout)`: Helper to run command and wait for prompt.
 *   `runModuleWithOutput(...)`: Helper to run a module via console commands.
 
-### `client.jobs` (`JobManager`)
+### `client.jobs` (JobManager)
 Manages background jobs.
-*   `list(): Promise<Record<string, any>>`: List active jobs.
-*   `stop(jobId: number)`: Stop a job.
-*   `info(jobId: number)`: Get info for a specific job ID.
-*   `infoByUuid(uuid: string)`: Get info for a job by its UUID (filters list).
+*   `list()`: List active jobs.
+*   `stop(jobId)`: Stop a job.
+*   `info(jobId)`: Get info for a specific job ID.
+*   `infoByUuid(uuid)`: Get info for a job by its UUID (filters list).
 
-### `client.plugins` (`PluginManager`)
+### `client.plugins` (PluginManager)
 Manages server plugins.
-*   `listLoaded(): Promise<string[]>`: List loaded plugins.
+*   `listLoaded()`: List loaded plugins.
 *   `load(pluginName, opts?)`: Load a plugin.
 *   `unload(pluginName)`: Unload a plugin.
+
+## Testing
+
+The library includes tests using Jest to ensure functionality. To run tests:
+
+```bash
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+```
 
 ## Error Handling
 
@@ -308,4 +379,12 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## License
 
-(Specify License - e.g., MIT, Apache 2.0)
+MIT License
+
+## Acknowledgements
+
+This library was inspired by the [pymetasploit3](https://github.com/DanMcInerney/pymetasploit3) Python library.
+
+## Support
+
+Have questions or need help? Please file an issue on GitHub: https://github.com/trinity-cloud/typesploit/issues
