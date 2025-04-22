@@ -12,6 +12,12 @@
     "clean": "rm -rf lib",
     "prepublishOnly": "npm run build"
   },
+  "files": [
+    "lib/**/*",
+    "bin/**/*", 
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "@msgpack/msgpack": "^2.8.0",
     "@types/node-fetch": "^2.6.12",

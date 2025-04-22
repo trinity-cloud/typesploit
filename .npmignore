@@ -1,0 +1,32 @@
+# Source code
+src/
+
+# Tests
+tests/
+coverage/
+
+# Configuration files
+tsconfig.json
+jest.config.js
+.gitignore
+.eslint*
+*.tsbuildinfo
+
+# Node dependencies (npm excludes automatically, but good practice)
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS generated files
+.DS_Store
+
+# Editor directories
+.vscode/
+.idea/
+
+# Environment variables
+.env*
