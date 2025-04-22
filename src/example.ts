@@ -15,7 +15,7 @@ const CONFIG = {
   // Edit these configuration values for your setup
   password: 'your_very_secret_password',
   server: '127.0.0.1',
-  port: 55552,
+  port: 55553,
   username: 'msf',
   ssl: true,
   // If you want to test a specific exploit against a target

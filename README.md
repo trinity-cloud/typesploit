@@ -67,7 +67,7 @@ Before using this library, you need to start the Metasploit RPC server:
 msfrpcd -P password -S -a 127.0.0.1
 
 # Or from within msfconsole
-load msgrpc Pass=password ServerHost=127.0.0.1 ServerPort=55553 SSL=false
+load msgrpc Pass=password ServerHost=127.0.0.1 ServerPort=55553
 ```
 
 ## Quickstart
