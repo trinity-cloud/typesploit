@@ -14,7 +14,9 @@ export class WorkspaceManager {
    * Returns Workspace objects, potentially from cache.
    */
   async list(): Promise<Record<string, Workspace>> {
-    const rawWorkspaces: WorkspaceInfo[] = await this.rpc.call(Methods.DbWorkspaces);
+    // Extract the 'workspaces' array from the response object
+    const response = await this.rpc.call(Methods.DbWorkspaces);
+    const rawWorkspaces: WorkspaceInfo[] = response.workspaces || []; // Handle cases where 'workspaces' might be missing
     const currentWorkspaces: Record<string, Workspace> = {};
     const currentNames = new Set<string>();
 

@@ -38,10 +38,6 @@ export abstract class MsfTable<TInfo, TListOptions extends DbListFilterOptions> 
         // The RPC call often uses the plural table name (e.g., db.hosts)
         const rpcMethod = `db.${this.tableNamePlural}`;
         // Check if the method name exists in Methods, otherwise handle potential error
-        if (!(rpcMethod in Methods)) {
-            console.warn(`RPC method ${rpcMethod} not found in defined methods. Attempting call anyway.`);
-            // Or throw: throw new Error(`RPC method ${rpcMethod} not defined.`);
-        }
         const res = await this.rpc.call(rpcMethod, [this.addWorkspace(options)]);
         // The result array is usually keyed by the plural table name
         return res[this.tableNamePlural] || [];
@@ -53,9 +49,6 @@ export abstract class MsfTable<TInfo, TListOptions extends DbListFilterOptions> 
      */
     async report(attributes: DbAttributeRecord): Promise<any> {
         const rpcMethod = `db.report_${this.tableNameSingular}`;
-        if (!(rpcMethod in Methods)) {
-             throw new Error(`RPC method ${rpcMethod} not defined.`);
-        }
         return this.rpc.call(rpcMethod, [this.addWorkspace(attributes)]);
     }
 
@@ -65,9 +58,6 @@ export abstract class MsfTable<TInfo, TListOptions extends DbListFilterOptions> 
      */
     async delete(attributes: DbAttributeRecord): Promise<any> {
          const rpcMethod = `db.del_${this.tableNameSingular}`;
-         if (!(rpcMethod in Methods)) {
-             throw new Error(`RPC method ${rpcMethod} not defined.`);
-         }
         return this.rpc.call(rpcMethod, [this.addWorkspace(attributes)]);
     }
 
@@ -77,9 +67,6 @@ export abstract class MsfTable<TInfo, TListOptions extends DbListFilterOptions> 
      */
     async get(attributes: DbAttributeRecord): Promise<TInfo | null> {
          const rpcMethod = `db.get_${this.tableNameSingular}`;
-         if (!(rpcMethod in Methods)) {
-             throw new Error(`RPC method ${rpcMethod} not defined.`);
-         }
         const res = await this.rpc.call(rpcMethod, [this.addWorkspace(attributes)]);
         // Result object is usually keyed by the singular table name
         return res[this.tableNameSingular] || null;
