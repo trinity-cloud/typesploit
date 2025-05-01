@@ -413,6 +413,10 @@ Catch these specific errors for more granular control flow.
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
 
+## Discord Server
+
+Trinity Cloud Discord Server is at https://discord.gg/K3A9fXpK. Connect with us!
+
 ## License
 
 MIT License
